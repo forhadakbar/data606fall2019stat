@@ -1,14 +1,15 @@
 ---
 title: "Chapter 3 - Probability"
-author: 'Md Forhad Akbar'
+author: "Md Forhad Akbar"
 output:
-  html_document:
-    df_print: paged
+  word_document: default
   pdf_document:
     extra_dependencies:
     - geometry
     - multicol
     - multirow
+  html_document:
+    df_print: paged
 ---
 
 ```{r setup, include=FALSE}
@@ -140,7 +141,7 @@ based on whether they are nonfiction or fiction and hardcover or paperback.
 (a) Find the probability of drawing a hardcover book first then a paperback fiction book second when drawing without replacement.  
 Answer: P(Hardcover first) x P(paperback fiction) = ( 28/95 ) x (59 / 94) = 18.50%  
 (b) Determine the probability of drawing a fiction book first and then a hardcover book second, when drawing without replacement.  
-Anwer: probability of drawing a fiction book first and then a hardcover book second, when drawing without replacement is 72/95 x 28/94 = 0.7578 x 0.2978 = 22.56%
+Anwer: probability of drawing a fiction book first and then a hardcover book second, when drawing without replacement is 72/95 x 28/94 = 22.58%
 
 (c) Calculate the probability of the scenario in part (b), except this time complete the calculations under the scenario where the first book is placed back on the bookcase before randomly drawing the second book.  
 Answer:P(first: fiction and second: hardcover) = (72/95) x (28/95) = 22.34%  
