@@ -1,11 +1,11 @@
 ---
 title: "Probability"
 output:
+  pdf_document: default
   html_document:
     css: ./lab.css
     highlight: pygments
     theme: cerulean
-  pdf_document: default
 ---
 
 ## Hot Hands
@@ -294,6 +294,7 @@ Answer:
 streak_length <- calc_streak(sim_basket)
 barplot(table(streak_length))
 ```
+
 -   Describe the distribution of streak lengths. What is the typical streak 
     length for this simulated independent shooter with a 45% shooting percentage?
     How long is the player's longest streak of baskets in 133 shots?  
@@ -306,7 +307,7 @@ boxplot(streak_length)
 summary(streak_length)
 ```
 
-The distribution of streak lengths is unimodal and right skewed. Typical streak length is 1. The longest streak is 8.
+The distribution of streak lengths is unimodal and right skewed. Typical streak length is 1. The longest streak is 5-8. Note here, that longest streak will be different everytime we run the code as it is a sample simulation.
 
 -   If you were to run the simulation of the independent shooter a second time, 
     how would you expect its streak distribution to compare to the distribution 
