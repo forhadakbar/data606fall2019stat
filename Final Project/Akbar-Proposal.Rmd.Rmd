@@ -1,0 +1,141 @@
+---
+title: "DATA 606 Data Project Proposal"
+author: "Md Forhad Akbar"
+output: pdf_document
+---
+### Load Package
+
+```{r load-package, warning=FALSE,message=FALSE}
+library(tidyverse)
+```
+
+### Data Preparation
+
+```{r setup, echo=TRUE, results='hide', warning=FALSE, message=FALSE}
+# load data
+my_loan_data<- read.csv("https://raw.githubusercontent.com/forhadakbar/data606fall2019stat/master/Final%20Project/Loan_prediction.csv")
+
+```
+
+```{r head}
+head(my_loan_data)
+```
+
+### Research question 
+
+**You should phrase your research question in a way that matches up with the scope of inference your dataset allows for.**  
+**About Company:** Dream Housing Finance company deals in all home loans. They have presence across all urban, semi urban and rural areas. Customer first apply for home loan after that company validates the customer eligibility for loan.  
+**Problem:** Company wants to automate the loan eligibility process (real time) based on customer detail provided while filling online application form. These details are Gender, Marital Status, Education, Number of Dependents, Income, Loan Amount, Credit History and others. To automate this process, they have given a problem to identify the customers segments, those are eligible for loan amount so that they can specifically target these customers.
+
+### Cases 
+
+**What are the cases, and how many are there?**
+```{r dim}
+dim(my_loan_data)
+```
+There are 614 cases  
+
+### Data collection 
+
+**Describe the method of data collection.**
+
+This data source was given as part of a data science challenge or practice problem. I downloaded the data and loaded to my git-hub account. I will read the data into R from my git-hub account using raw link of the csv file using read.csv command.
+
+### Type of study 
+
+**What type of study is this (observational/experiment)?**  
+
+This is an observational study
+
+### Data Source 
+
+**If you collected the data, state self-collected. If not, provide a citation/link.**
+
+Source: https://datahack.analyticsvidhya.com/contest/practice-problem-loan-prediction-iii/
+
+### Dependent Variable
+
+**What is the response variable? Is it quantitative or qualitative?**
+
+Loan_Status is the response variable. It is a categorical variable which gives us yes and no for loan approval status.
+
+### Independent Variable
+
+**You should have two independent variables, one quantitative and one qualitative.**
+
+I have few independent variables that i will consider for now. I will choose the most appropiate variables after doing exploratory analysis.  
+
+Applicants took a loan before. Credit history is the variable which answers that.  
+Applicants with higher incomes. So, we might look at the applicant income variable.  
+Applicants with higher education.  
+Gender of the applicant.  
+Number of Dependens an applicant has.  
+Property area contains location information of the loan property applied for.  
+
+### Relevant summary statistics 
+
+**Provide summary statistics for each the variables. Also include appropriate visualizations related to your research question (e.g. scatter plot, boxplots, etc). This step requires the use of R, hence a code chunk is provided below. Insert more code chunks as needed.**
+
+```{r}
+str(my_loan_data)
+```
+
+Property Area:  
+```{r}
+summary(my_loan_data$Property_Area)
+```
+
+```{r}
+ggplot(data=my_loan_data, aes(my_loan_data$Property_Area)) + 
+  geom_histogram(col="red",fill="lightblue",stat="count" ) +
+  facet_grid(~my_loan_data$Loan_Status)+
+  scale_x_discrete()
+```
+Coapplicant Income:  
+```{r}
+summary(my_loan_data$CoapplicantIncome)
+```
+
+```{r}
+ggplot(data=my_loan_data, aes(x= my_loan_data$CoapplicantIncome)) + 
+  geom_histogram(col="red",fill="lightblue", bins = 15) +
+  facet_grid(~my_loan_data$Loan_Status)+
+  theme_bw()
+```
+Education:  
+```{r}
+summary(my_loan_data$Education)
+```
+
+```{r}
+ggplot(data=my_loan_data, aes(my_loan_data$Education)) + 
+  geom_histogram(col="red",fill="lightblue",stat="count" ) +
+  facet_grid(~my_loan_data$Loan_Status)+
+  scale_x_discrete()+
+  theme_bw()
+```
+Number of Dependents:  
+```{r}
+summary(my_loan_data$Dependents)
+```
+
+```{r}
+ggplot(data=my_loan_data, aes(my_loan_data$Dependents)) + 
+  geom_histogram(col="red",fill="lightblue",stat="count" ) +
+  facet_grid(~my_loan_data$Loan_Status)+
+  scale_x_discrete()+
+  theme_bw()
+```
+Gender:  
+```{r}
+summary(my_loan_data$Gender)
+```
+
+```{r}
+ggplot(data=my_loan_data, aes(my_loan_data$Gender)) + 
+  geom_histogram(col="red",fill="lightblue",stat="count") +
+  facet_grid(~my_loan_data$Loan_Status)+
+  scale_x_discrete()+
+  theme_bw()
+```
+
