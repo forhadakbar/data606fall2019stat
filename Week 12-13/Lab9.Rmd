@@ -2,11 +2,11 @@
 title: "Multiple linear regression"
 auther: "Md Forhad Akbar"
 output:
-  pdf_document: default
   html_document:
     css: ./lab.css
     highlight: pygments
     theme: cerulean
+  pdf_document: default
 ---
 
 ## Grading the professor
@@ -91,7 +91,7 @@ library(DATA606)
     summary(evals$score)
     ```
 
-The distribution is multi-modal and skewed left with majority of the observation with score of between 4 and 5. This is not what i expected. Student have far more positive rating than negative. I expected a normal distribution where most teachers would be rated as average and fewer teachers will be evaluated in the extremes excellent or unsatisfactory.  
+The distribution is uni-modal and skewed left with majority of the observation with score of between 4 and 5. This is not what i expected. Student have far more positive rating than negative. I expected a normal distribution where most teachers would be rated as average and fewer teachers will be evaluated in the extremes excellent or unsatisfactory.  
 
 3.  Excluding `score`, select two other variables and describe their relationship 
     using an appropriate visualization (scatterplot, side-by-side boxplots, or 
