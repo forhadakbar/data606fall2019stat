@@ -2,11 +2,11 @@
 title: "Multiple linear regression"
 auther: "Md Forhad Akbar"
 output:
+  pdf_document: default
   html_document:
     css: ./lab.css
     highlight: pygments
     theme: cerulean
-  pdf_document: default
 ---
 
 ## Grading the professor
@@ -163,11 +163,17 @@ R2 is about 3.3%, hence, 3.3% of evaluations can be predicted accurately with th
 
 6.  Use residual plots to evaluate whether the conditions of least squares
     regression are reasonable. Provide plots and comments for each one (see
-    the Simple Regression Lab for a reminder of how to make these).
+    the Simple Regression Lab for a reminder of how to make these).  
+    **Answer:**  
 ```{r}
 library(DATA606)
 plot_ss(x = evals$bty_avg, y = evals$score, showSquares = TRUE)
 ```
+
+```{r}
+hist(m_bty$residuals, col = "blue")
+```
+
 Conditions for the least squares line  
 Linearity: Though it is difficult to tell with so many points, but it appear that the data show a slightly linear positive linearity.    
 Nearly Normal residuals: From the Histogram, the residuals show a slightly left skewed distribution. The normal probability plot of the residuals shows that the points do not follow the line for upper quadriles.  
