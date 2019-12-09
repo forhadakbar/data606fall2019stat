@@ -1,0 +1,304 @@
+---
+title: "DATA 606 Final Project"
+author: "Forhad Akbar"
+date: "12/04/2019"
+output:
+  rmdformats::readthedown
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Libraries
+
+
+```{r, eval=TRUE, message=FALSE, warning=FALSE}
+library(tidyverse)
+library(caTools)
+library(ROCR)
+library(rpart)
+library(rmdformats)
+library(randomForest) 
+```
+
+## Introduction
+
+**Research question**  
+**About Company:** Dream Housing Finance company deals in all home loans. They have presence across all urban, semi urban and rural areas. Customer first apply for home loan after that company validates the customer eligibility for loan.  
+**Problem:** Company wants to automate the loan eligibility process (real time) based on customer detail provided while filling online application form. These details are Gender, Marital Status, Education, Number of Dependents, Income, Loan Amount, Credit History and others. To automate this process, they have given a problem to identify the customers segments, those are eligible for loan amount so that they can specifically target these customers.
+
+## Data
+
+This data source was given as part of a data science challenge or practice problem. I downloaded the data and loaded to my git-hub account. I will read the data into R from my git-hub account using raw link of the csv file using read.csv command.
+
+Source: https://datahack.analyticsvidhya.com/contest/practice-problem-loan-prediction-iii/
+
+
+```{r echo=TRUE, results='hide', warning=FALSE, message=FALSE}
+# load data
+my_loan_data<- read.csv("https://raw.githubusercontent.com/forhadakbar/data606fall2019stat/master/Final%20Project/Loan_prediction.csv")
+
+```
+
+```{r head}
+head(my_loan_data)
+```
+
+```{r dim}
+dim(my_loan_data)
+```
+
+There are 614 cases and 13 columns. Each case or observation represent a loan application.
+
+## Exploratory Data Analysis & Inference
+
+### Dependent Variable
+
+Loan_Status is the response variable. It is a categorical variable which gives us yes and no for loan approval status.
+
+### Independent Variable
+
+I have few independent variables that i will consider for now. I will choose the most appropiate variables after doing exploratory analysis.  
+
+Applicants took a loan before. Credit history is the variable which answers that.  
+Applicants with higher incomes. So, we might look at the applicant income variable.  
+Applicants with higher education.  
+Gender of the applicant.  
+Number of Dependens an applicant has.  
+Property area contains location information of the loan property applied for.
+
+### Relevant summary statistics
+
+```{r}
+str(my_loan_data)
+```
+
+```{r}
+summary(my_loan_data)
+```
+
+### Data Cleaning
+
+LoanAmount variable has 22 Null Value -Loan_Amount_Term has 14 null values -Credit_History has 50 Null values Data set observation.
+
+
+```{r}
+#Store backup before removing missing values
+my_loan_data_backup <- my_loan_data
+
+#Retrun all rows with missing values
+my_loan_data[!complete.cases(my_loan_data),]
+
+#store only data without missing values (removed 85 rows)
+my_loan_data<- my_loan_data[complete.cases(my_loan_data),]
+```
+
+### Visual Analysis
+
+#### **Property Area:**   
+```{r}
+summary(my_loan_data$Property_Area)
+```
+
+```{r}
+ggplot(data=my_loan_data, aes(my_loan_data$Property_Area)) + 
+  geom_histogram(col="red",fill="lightblue",stat="count" ) +
+  facet_grid(~my_loan_data$Loan_Status)+
+  scale_x_discrete()
+```
+
+Histogram of Property Area shows that Loan approval is more into Semiurban area than Rural and Urban. Urban area has lowest loan approval. Loan rejection is lowest in Rural area. Semiurban & Urban has same loan rejection  
+
+#### **Coapplicant Income:**   
+```{r}
+summary(my_loan_data$CoapplicantIncome)
+```
+
+```{r}
+ggplot(data=my_loan_data, aes(x= my_loan_data$CoapplicantIncome)) + 
+  geom_histogram(col="red",fill="lightblue", bins = 15) +
+  facet_grid(~my_loan_data$Loan_Status)+
+  theme_bw()
+```
+
+Histogram shows that low income peoples are mainly applying for loans and number of loan rejection is more in the lowest income segment  
+
+#### **Education:**  
+```{r}
+summary(my_loan_data$Education)
+```
+
+```{r}
+ggplot(data=my_loan_data, aes(my_loan_data$Education)) + 
+  geom_histogram(col="red",fill="lightblue",stat="count" ) +
+  facet_grid(~my_loan_data$Loan_Status)+
+  scale_x_discrete()+
+  theme_bw()
+```
+
+Based on loan approval flag shows that - loan approval rate for graduate is more than non graduate
+
+#### **Number of Dependents:**  
+```{r}
+summary(my_loan_data$Dependents)
+```
+
+```{r}
+ggplot(data=my_loan_data, aes(my_loan_data$Dependents)) + 
+  geom_histogram(col="red",fill="lightblue",stat="count" ) +
+  facet_grid(~my_loan_data$Loan_Status)+
+  scale_x_discrete()+
+  theme_bw()
+```
+
+Loan approval shows that -People having no dependents have maximum loan approval and rejection count
+
+#### **Gender:**  
+```{r}
+summary(my_loan_data$Gender)
+```
+
+```{r}
+ggplot(data=my_loan_data, aes(my_loan_data$Gender)) + 
+  geom_histogram(col="red",fill="lightblue",stat="count") +
+  facet_grid(~my_loan_data$Loan_Status)+
+  scale_x_discrete()+
+  theme_bw()
+```
+
+Male applicant has higher loan approval and rejection count than female applicant. So this looks to be an influencing factor 
+
+## Logestic Regression
+
+Logistic Regression, in simple terms, predicts the probability of occurrence of an event by fitting data to a logit function. Regression coefficients represent the mean change in the response variable for one unit of change in the predictor variable while holding other predictors in the model constant. This type of models is part of a larger class of algorithms known as Generalized Linear Model or GLM.  
+
+### Preparing Data for The Model:
+
+```{r}
+my_loan_data_1 <- my_loan_data[,2:13]
+ind <- sample.split (Y=my_loan_data_1$Loan_Status, SplitRatio=0.8)
+traindf<- my_loan_data_1 [ind,]
+testdf<- my_loan_data_1 [!ind,]
+```
+
+### Logistic Regression Model
+
+```{r}
+#Logistic regression
+LRmodel<-glm(Loan_Status~.,traindf,family = "binomial")
+summary(LRmodel)
+```
+
+### Most significant variables are  
+* Credit_History
+* Property_AreaSemiurban
+
+
+```{r}
+res<-predict(LRmodel,testdf,type="response")
+res
+```
+
+```{r}
+table(Actualvalue=testdf$Loan_Status,Predictedvalue=res>0.5)
+(16+71)/ (16+17+2+71)
+```
+
+Accuracy: 82.07%
+
+## Decision Tree
+
+Decision trees create a set of binary splits on the predictor variables in order to create a tree that can be used to classify new observations into one of two groups. Here, we will be using classical trees. The algorithm of this model is the following:
+
+Choose the predictor variable that best splits the data into two groups;
+
+Separate the data into these two groups;
+
+Repeat these steps until a subgroup contains fewer than a minimum number of observations;
+
+To classify a case, run it down the tree to a terminal node, and assign it the model outcome value assigned in the previous step.
+
+```{r}
+set.seed(42)
+sample <- sample.int(n = nrow(my_loan_data_1), size = floor(.70*nrow(my_loan_data_1)), replace = F)
+trainnew <- my_loan_data_1[sample, ]
+testnew  <- my_loan_data_1[-sample, ]
+```
+
+```{r}
+dtree <- rpart(Loan_Status ~ Credit_History + Education + Self_Employed + Property_Area + LoanAmount + 
+                 ApplicantIncome, method="class", data=traindf,parms=list(split="information"))
+dtree$cptable
+```
+
+
+```{r}
+plotcp(dtree)
+```
+```{r}
+dtree.pruned <- prune(dtree, cp=.02290076)
+library(rpart.plot)
+prp(dtree.pruned, type = 2, extra = 104,
+    fallen.leaves = TRUE, main="Decision Tree")
+```
+
+```{r}
+dtree.pred <- predict(dtree.pruned, trainnew, type="class")
+dtree.perf <- table(trainnew$Loan_Status, dtree.pred,
+                    dnn=c("Actual", "Predicted"))
+dtree.perf
+```
+```{r}
+dtree_test <- rpart(Loan_Status ~ Credit_History+Education+Self_Employed+Property_Area+LoanAmount+
+                 ApplicantIncome,method="class", data=testnew,parms=list(split="information"))
+dtree_test$cptable
+```
+
+```{r}
+plotcp(dtree_test)
+```
+```{r}
+dtree_test.pruned <- prune(dtree_test, cp=.01639344)
+prp(dtree_test.pruned, type = 2, extra = 104,
+    fallen.leaves = TRUE, main="Decision Tree")
+```
+
+Accuracy: 84% Results show better performance than the logistic model.
+
+## Random Forest
+
+```{r}
+set.seed(42) 
+fit.forest <- randomForest(Loan_Status ~ Credit_History+Education+Self_Employed+Property_Area+LoanAmount+
+                             ApplicantIncome, data=trainnew,
+                           na.action=na.roughfix,
+                           importance=TRUE)
+fit.forest
+```
+
+```{r}
+importance(fit.forest, type=2)
+```
+
+```{r}
+forest.pred <- predict(fit.forest, testnew)
+forest.perf <- table(testnew$Loan_Status, forest.pred,
+                     dnn=c("Actual", "Predicted"))
+forest.perf
+```
+
+Here is the accuracy of the model: 80.50%
+
+## Conclusion   
+
+After analyzing the data from the loan prediction dataset, the data shows that Credit History and Property_AreaSemiurban are most significant variables to predict whether a loan application will approved or not. We can predict the loan approval using different models. Here, we got 82.07% accuracy for logistic regresission, 84% accuracy for Decesion tree and 80.50% accuracy for random forest.
+
+The dataset is relatively small. A larger dataset will help to improve the model accuracy.
+
+We can conclude that the company should target customers with Credit history  and customer who lives in Semiurban area.
+
+
+## Reference 
+
+https://datahack.analyticsvidhya.com/contest/practice-problem-loan-prediction-iii/
